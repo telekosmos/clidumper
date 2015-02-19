@@ -1,0 +1,8 @@
+{
+  db: {
+    "host": "localhost",
+    "name": "appform",
+    "user": "gcomesana",
+    "pwd": "appform"
+  }
+}

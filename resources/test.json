@@ -1,0 +1,41 @@
+{
+  db: {
+    "host": "localhost",
+    "name": "appform",
+    "user": "gcomesana",
+    "pwd": "appform"
+  },
+
+  server: {
+    "host": "localhost",
+    "port": 8080,
+    "app": "admtool",
+    "serviceName": "servlet/AjaxUtilServlet"
+    user: 'gcomesana@cnio.es',
+    pass: 'techn1C0'
+    authPath: '/jsp/j_security_check'
+  },
+
+  dumps: [{
+    "prj": "Pangen-EU",
+    questionnaire: "QES_Spain",
+    group: "spain",
+    section: 2,
+    rep: true,
+    out: ""
+  }, {
+    "prj": "Pangen-EU",
+    questionnaire: "QES_Spain",
+    group: "spain",
+    section: 3,
+    rep: 1,
+    out: ""
+  }, {
+    "prj": "Pangen-EU",
+    questionnaire: "QES_Spain",
+    group: "Hospital del Mar",
+    section: 3,
+    rep: false,
+    out: ""
+  }]
+}
