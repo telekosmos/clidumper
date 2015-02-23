@@ -60,7 +60,7 @@ describe 'Parser for the "dirty-json" config file', () ->
     promise = jp.parse()
     promise.should.eventually.be.fulfilled
     promise.should.eventually.be.an 'object'
-    promise.should.eventually.to.include.keys 'db', 'server'
+    promise.should.eventually.to.include.keys 'db', 'server', 'dumps'
 
 
 
@@ -85,7 +85,7 @@ describe 'Parser for the "dirty-json" config file', () ->
 
     jp.parse().then (jsonObj) ->
       should.exist(jsonObj.server)
-      jsonObj.server.should.to.include.keys 'host', 'port', 'app', 'serviceName'
+      jsonObj.server.should.to.include.keys 'host', 'port', 'app', 'servicePath'
 
   it 'should get a list of data retrieval config objects', () ->
     jp = new JSONParser(cfgFile)

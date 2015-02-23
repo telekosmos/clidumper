@@ -10,9 +10,9 @@
     "host": "localhost",
     "port": 8080,
     "app": "admtool",
-    "serviceName": "servlet/AjaxUtilServlet"
-    user: 'gcomesana@cnio.es',
-    pass: 'techn1C0'
+    "servicePath": "servlet/AjaxUtilServlet"
+    user: 'mmarquez',
+    pass: 'mmarquez'
     authPath: '/jsp/j_security_check'
   },
 

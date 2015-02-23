@@ -13,7 +13,7 @@ jsonObj =
     user: "gcomesana",
     pwd: "appform"
   ,
-  server:
+  server: # the name of the app for a normal access through the schema http://host:port/app/<servicePath|authPath>
     host: 'localhost'
     app: 'admtool'
     servicePath: 'datadump'
@@ -66,7 +66,7 @@ ParserJson = () ->
           resolve JSON.parse(jsonStr)
         else
           reject "parse json err: #{guard}"
-      , 1500
+      , 500
 
   obj =
     parse: parse
@@ -227,28 +227,32 @@ reqIndex.then (httpResp) ->
 
 console.log "\n*** Downloader..."
 filename = 'ISBlaC-Aliquots_SP_New-sec3'
+filename = '157-401-50-3.csv'
 loggedOut = false
 Downloader = require "#{appcfg.paths.root}/lib/downloader"
 downloader = new Downloader(jsonObj.server)
 downloader.login().then (resp) ->
   csvParams =
-    prjid: 188
-    grpid: 4
-    intrvid: 4100
+    # big
+    prjid: 157 # 188
+    grpid: 401 # 4
+    intrvid: 50 # 4100
     secid: 3
-    # repd: 1
+    repd: 1
 
   if csvParams.repd
     filename += '.xlsx'
     downloader.getXlsx csvParams, filename
+
   else
     filename += '.csv'
     downloader.getCsv csvParams, filename
 
-
 .then (resp) ->
 #  ws = fs.createWriteStream(filename)
 #  resp.pipe(ws)
+  console.log "This is resp..."
+  resp.pipe(fs.createWriteStream(filename))
   console.log "Downloader cookies: #{downloader.getCookies()}"
   downloader.logout()
 .then (resp) ->

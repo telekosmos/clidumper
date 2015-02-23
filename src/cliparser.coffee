@@ -1,9 +1,15 @@
 
-
+###
+# Command line parser for the dumper
+###
 parser = () ->
   parserObj = {}
   program = require 'commander'
 
+  ###
+  # Just makes a parser getting name of the batch file used to configure
+  # the dumper or undefined if no param was provided
+  ###
   parse = () ->
     program.version '0.0.1'
     .usage '-b, --batch <config_file>'

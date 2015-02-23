@@ -20,7 +20,11 @@ DBRetriever = (dbCfgObj) ->
 
   grpIdSql = "select idgroup from appgroup where upper(name) = upper(:name)"
   prjIdSql = "select idprj from project where upper(name) = upper(:name)"
-  intrvIdSql = "select idinterview from interview where upper(name) = upper(:name)"
+  intrvIdSql = "select idinterview
+    from interview i, project p
+    where upper(i.name) = upper(:name)
+      and p.name = :prjname
+      and i.codprj = p.idprj;"
 
   ###
   # Method to make the query in order to get the data.
@@ -29,14 +33,26 @@ DBRetriever = (dbCfgObj) ->
   # @return {Array} an array of results
   # @promise
   ###
-  query = (what, name) ->
-    switch what
-      when PRJ then qry = prjIdSql
-      when GRP then qry = grpIdSql
-      when INTRV then qry = intrvIdSql
-      else qry = prjIdSql
+  query = (what) ->
+    name = arguments[1]
+    projName = arguments[2]
 
-    sequelize.query qry, {replacements: {name: name}, type: Sequelize.QueryTypes.SELECT}
+    switch what
+      when PRJ
+        qry = prjIdSql
+        replacements = {name: name}
+      when GRP
+        qry = grpIdSql
+        replacements = {name: name}
+      when INTRV
+        qry = intrvIdSql
+        replacements = {name: name, prjname: projName}
+        console.log "intrv: #{name}; prj: #{projName}"
+      else
+        qry = prjIdSql
+        replacements = {name: name}
+
+    sequelize.query qry, {replacements: replacements, type: Sequelize.QueryTypes.SELECT}
 
 
   expose.connect = () ->
@@ -56,6 +72,17 @@ DBRetriever = (dbCfgObj) ->
     else
       new Promise (resolve) ->
         resolve(false)
+
+  expose.getAll = (prjName, grpName, intrvName) ->
+
+    Promise.join this.getPrjId(prjName), this.getGrpId(grpName), this.getIntrvId(intrvName, prjName), (prjId, grpId, intrvId) ->
+      vals =
+        prjIds: prjId # returns [{idprj: prjId}]
+        grpIds: grpId # returns [{idgrp: grpId},...,{idgrp: grpId}]
+        intrvIds: intrvId # returns [{idintrv: intrvId},...,{idintrv: intrvId}]
+
+    # Promise.all [this.getPrjId(prjName), this.getGrpId(grpName), this.getIntrvId(intrvName)]
+    
   ###
   # Gets a project database id from the name
   # @param {String} the project name
@@ -64,7 +91,7 @@ DBRetriever = (dbCfgObj) ->
   ###
   expose.getPrjId = (name) -> query PRJ, name
   expose.getGrpId = (name) -> query GRP, name
-  expose.getIntrvId = (name) -> query INTRV, name
+  expose.getIntrvId = (name, prj) -> query INTRV, name, prj
 
   expose
 
