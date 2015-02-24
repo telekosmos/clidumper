@@ -130,7 +130,10 @@ describe 'Database retrieval of ids based on dump parameters', () ->
 
   it 'should return all id values', () ->
     dbRetr.connect()
-    promise = dbRetr.getAll dumpCfgMock.dumps[0].prj, dumpCfgMock.dumps[0].group, dumpCfgMock.dumps[0].questionnaire
+    prjName = dumpCfgMock.dumps[0].prj
+    grpName = dumpCfgMock.dumps[0].group
+    intrvName = dumpCfgMock.dumps[0].questionnaire
+    promise = dbRetr.getAll prjName, grpName, intrvName
     promise.should.eventually.be.fulfilled
     promise.should.eventually.be.an 'object'
     promise.then (objVal) ->

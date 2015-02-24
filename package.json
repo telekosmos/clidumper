@@ -5,7 +5,6 @@
   "engines": {
     "node": ">=0.10"
   },
-
   "dependencies": {
     "commander": "~2.6.x",
     "request": "~2.x.x",
@@ -19,14 +18,12 @@
     "bluebird": "^2.9.7",
     "lodash": "^3.0"
   },
-
   "devDependencies": {
     "mocha": "~1.21.x",
     "chai": "~1.10.x",
     "sinon": "^1.12",
     "sinon-chai": "~2.6.x",
     "chai-as-promised": "~4.1.x",
-
     "gulp": "^3.8.x",
     "gulp-uglify": "",
     "gulp-autoprefixer": "",
@@ -38,18 +35,14 @@
     "gulp-livereload": "",
     "gulp-cache": "",
     "gulp-coffee": "~2.3.x",
-    "gulp-sourcemaps": "^1.3",
-    "gulp-util":"",
+    "gulp-sourcemaps": "~1.2.x",
+    "gulp-util": "",
     "gulp-if": "",
     "del": "~1.1.x",
-    "gulp-sourcemaps": "~1.2.x",
     "gulp-mocha": "^2.x",
-    "del": "~1.1.x"
+    "gulp-run": "~1.6.6"
   },
-
   "bin": {
     "dumper": "./main.js"
   }
-
-
 }

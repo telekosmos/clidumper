@@ -39,6 +39,11 @@ describe 'Downloader data using params from config file', () ->
   beforeEach () ->
     downloader = new Downloader(hostParams)
 
+  it 'should check server is alive', () ->
+    aliveProm = downloader.serverAlive()
+    aliveProm.should.eventually.be.fulfilled
+    aliveProm.should.eventually.be.an 'boolean'
+
 
   it 'should authentify via cookies', () ->
     promise = downloader.login()
@@ -56,6 +61,7 @@ describe 'Downloader data using params from config file', () ->
       ckList.should.to.have.length 2
       ckList[0].should.be.an 'object'
       downloader.logout()
+
 
   it 'should logout successfully', () ->
     logged = downloader.login()

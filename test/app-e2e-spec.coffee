@@ -54,5 +54,29 @@ describe 'End2End application workflow', () ->
     jsonParser = new JSONParser(file)
     cfgObjPromise = jsonParser.parse()
     should.exist DBRetriever
+    cfgObjPromise.should.eventually.be.fulfilled
+    cfgObjPromise.then (cfgObj) ->
+      should.exist cfgObj
+      should.exist cfgObj.db
+      dbRtr = new DBRetriever cfgObj.db
+      should.exist dbRtr
+      should.exist cfgObj.dumps
+      cfgObj.dumps.should.have.length 3
+      # and loop over the dumps, getting the dbIds for every dump
+      # then try to mock the downloads...
+      dumpPromises = []
+      dbRtr.connect()
+      cfgObj.dumps.every (dump, index) ->
+        dumpProm = dbRtr.getAll dump.prj, dump.group, dump.questionnaire
+        dumpPromises.push dumpProm
 
-
+      dumpPromises.should.have.length 3;
+      dumpPromises.every (promise) ->
+        promise.should.eventually.be.fulfilled
+        promise.then (val) ->
+          should.exist val
+          should.exist val.prjIds
+          val.prjIds[0].idprj.should.be.equal 50
+          console.log "\n**-> Ids: p: #{val.prjIds[0].idprj};
+            g: #{val.grpIds[0].idgroup};
+            i: #{val.intrvIds[0]?.idinterview}"

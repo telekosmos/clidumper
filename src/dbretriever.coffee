@@ -47,7 +47,6 @@ DBRetriever = (dbCfgObj) ->
       when INTRV
         qry = intrvIdSql
         replacements = {name: name, prjname: projName}
-        console.log "intrv: #{name}; prj: #{projName}"
       else
         qry = prjIdSql
         replacements = {name: name}
@@ -68,13 +67,20 @@ DBRetriever = (dbCfgObj) ->
 
   expose.isConnected = () -> # sequelize?.authenticate() # Promise is returned!!!
     if sequelize
-      sequelize.authenticate()
+      sequelize?.authenticate()
     else
       new Promise (resolve) ->
         resolve(false)
 
+  ###
+  # Gets all database ids for the project, group and questionnaire based on project
+  # @param {String} the project name
+  # @param {String} the group name
+  # @param {String} the questionnaire name
+  # @return {Object} an object with an array of result for every entity
+  # @promise
+  ###
   expose.getAll = (prjName, grpName, intrvName) ->
-
     Promise.join this.getPrjId(prjName), this.getGrpId(grpName), this.getIntrvId(intrvName, prjName), (prjId, grpId, intrvId) ->
       vals =
         prjIds: prjId # returns [{idprj: prjId}]

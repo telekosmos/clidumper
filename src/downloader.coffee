@@ -36,6 +36,16 @@ Downloader = (serverParams) ->
     reqPromise = rp {url: urlIndex, resolveWithFullResponse: true, jar: cookieJar}
     reqPromise
 
+  ###
+  # Checks if the server is alive by requesting the index page
+  # @return {boolean} true if is alive; otherwise false
+  # @promise
+  ###
+  expose.serverAlive = () ->
+    index().then (httpResp) ->
+      true
+    .catch (err) ->
+      false
 
   expose.logout = () ->
     logoutObj =
