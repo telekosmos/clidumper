@@ -19,7 +19,7 @@ DBRetriever = (dbCfgObj) ->
   dbCfg = dbCfgObj
 
   grpIdSql = "select idgroup from appgroup where upper(name) = upper(:name)"
-  prjIdSql = "select idprj from project where upper(name) = upper(:name)"
+  prjIdSql = "select idprj, project_code from project where upper(name) = upper(:name)"
   intrvIdSql = "select idinterview
     from interview i, project p
     where upper(i.name) = upper(:name)
@@ -83,7 +83,7 @@ DBRetriever = (dbCfgObj) ->
   expose.getAll = (prjName, grpName, intrvName) ->
     Promise.join this.getPrjId(prjName), this.getGrpId(grpName), this.getIntrvId(intrvName, prjName), (prjId, grpId, intrvId) ->
       vals =
-        prjIds: prjId # returns [{idprj: prjId}]
+        prjIds: prjId # returns [{idprj: prjId, project_code: codproj}]
         grpIds: grpId # returns [{idgrp: grpId},...,{idgrp: grpId}]
         intrvIds: intrvId # returns [{idintrv: intrvId},...,{idintrv: intrvId}]
 

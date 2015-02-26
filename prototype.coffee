@@ -22,18 +22,18 @@ jsonObj =
     authPath: 'jsp/j_security_check'
   ,
   dumps: [
-    prj: "Pangen-EU",
-    questionnaire: "QES_Spain",
-    group: "Spain",
-    section: 2,
-    rep: true,
+    prj: "PanGen-Eu",
+    questionnaire: 'QES_Español' # "QES_Spain",
+    group: 'Hospital Ramón y Cajal' # "Spain",
+    section: 3,
+    repd: false,
     out: ""
   ,
-    prj: "Pangen-EU",
+    prj: "PanGen-Eu",
     questionnaire: "RecogidaMuestra_ES",
     group: "Spain",
-    section: 3,
-    rep: true,
+    section: 2,
+    repd: true,
     out: ""
   ]
 jsonStr = JSON.stringify jsonObj
@@ -47,7 +47,7 @@ FileReader = () ->
       even = (guard % 2) == 0
       setTimeout () ->
         if even then resolve "#{jsonStr}" else reject "err of: #{guard}"
-      , 1200
+      , 500
 
     deferred = new Promise(promiseFunc)
 
@@ -137,6 +137,7 @@ DBRetriever = () ->
 
 RealDB = require "#{appcfg.paths.root}/lib/dbretriever"
 ##############################
+###
 fr = new FileReader()
 pj = new ParserJson()
 console.log 'About to read.then(parse) a file...'
@@ -151,7 +152,7 @@ fr.read().then pj.parse
   grpId = db.getGrpId dump.group
 .then (grpId) -> console.log "Then the retrieved group has id #{grpId}"
 .catch (err) -> console.log "ERR: #{err}"
-
+###
 realDb = new RealDB(jsonObj.db)
 realDb.connect()
 realDb.isConnected().then (val) ->
@@ -168,7 +169,8 @@ promise.then (val) ->
 .catch (err) ->
   console.error "Err retrieving project id: #{err}"
 
-# Downloader
+
+# Downloader #################################################################
 urlAuth = 'http://localhost:8080/admtool/jsp/j_security_check'
 urlIndex = 'http://localhost:8080/admtool/jsp/index.jsp'
 urlGetHosps = 'http://localhost:8080/admtool/servlet/AjaxUtilServlet?what=hosp&grpid=301&prjid=-1'
@@ -203,6 +205,7 @@ logoutObj =
 console.log "\n\nPromise based request (simplified)!!!!"
 cookieSet = []
 
+###
 rp = require 'request-promise'
 cookieJar = rp.jar()
 reqIndex = rp {url: urlIndex, resolveWithFullResponse: true, jar: cookieJar}
@@ -223,15 +226,33 @@ reqIndex.then (httpResp) ->
   console.log "And the cookies: #{cookieJar.getCookieString(urlIndex)}"
 .catch (catchErr) ->
   console.error "Catch ERR: #{catchErr}"
+###
 
 
 console.log "\n*** Downloader..."
 filename = 'ISBlaC-Aliquots_SP_New-sec3'
-filename = '157-401-50-3.csv'
+filename = '157-401-50-3'
 loggedOut = false
 Downloader = require "#{appcfg.paths.root}/lib/downloader"
 downloader = new Downloader(jsonObj.server)
-downloader.login().then (resp) ->
+dumps = jsonObj.dumps
+
+dumpPromises = []
+dumps.every (dump, index) ->
+  dumpProm = realDb.getAll dump.prj, dump.group, dump.questionnaire
+  # dumpPromises.push dumpProm
+  dumpPromises[index] = dumpProm
+
+Promise.all(dumpPromises)
+.then (dumpIds) ->
+  dumpIds.forEach (ids, index) ->
+    dumps[index].prjid = ids.prjIds[0].project_code # idprj
+    dumps[index].grpid = ids.grpIds[0].idgroup
+    dumps[index].intrvid = ids.intrvIds[0]?.idinterview
+
+  downloader.login()
+
+.then (resp) ->
   csvParams =
     # big
     prjid: 157 # 188
@@ -242,17 +263,31 @@ downloader.login().then (resp) ->
 
   if csvParams.repd
     filename += '.xlsx'
-    downloader.getXlsx csvParams, filename
+    # downloader.getXlsx csvParams, filename
 
-  else
-    filename += '.csv'
-    downloader.getCsv csvParams, filename
+  dumps.forEach (dump, index) ->
+    dumpCfg =
+      prjid: dump.prjid
+      grpid: dump.grpid
+      intrvid: dump.intrvid
+      secid: dump.section
+
+    dumpCfg.repd = 1 if dump.repd
+    # if dump.rep then dumpCfg.rep = 1
+
+    # ISBlaC-Aliquots_SP_New-sec1.ext
+    filename = "#{dump.prj}-#{dump.group}-#{dump.questionnaire}-#{dumpCfg.secid}"
+    console.log "About to download #{filename}"
+    # if index is 0
+    if dumpCfg.repd
+      downloader.getXlsx dumpCfg, "#{filename}.xlsx"
+    else
+      downloader.getCsv dumpCfg, "#{filename}.csv"
 
 .then (resp) ->
 #  ws = fs.createWriteStream(filename)
 #  resp.pipe(ws)
-  console.log "This is resp..."
-  resp.pipe(fs.createWriteStream(filename))
+  # resp.pipe(fs.createWriteStream(filename))
   console.log "Downloader cookies: #{downloader.getCookies()}"
   downloader.logout()
 .then (resp) ->
@@ -336,31 +371,6 @@ request urlIndex, (err, httpResp, body) ->
 
 ###
 
-
-
-
-
-###
-.on 'error', (err) ->
-  console.log "Event err: #{err} -> #{err.stack}"
-.on 'response', (resp) ->
-  console.log "Response: #{resp.body}"
-###
-
-
-###
-  cliparser.parse().then (file)->
-  fileparser.parse().then (jsonObj) ->
-    hostParams = jsonObj.host
-    dbParams = jsonObj.db
-    dumps = jsonObj.dumps
-    dumps.forEach (dump) ->
-      dbIds = dbRetr.getAll(dump)
-      filename = dump.project+dump.group+dump.section+dump.rep
-      downloader.getFile(dbIds, filename).then (f) ->
-        writefile(f)
-
-###
 
 ###
 fr.read().then (val) ->
