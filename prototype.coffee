@@ -1,3 +1,6 @@
+#!/usr/bin/env coffee
+
+# require 'coffee-script'
 
 Promise = require 'bluebird'
 Sequelize = require 'sequelize'
