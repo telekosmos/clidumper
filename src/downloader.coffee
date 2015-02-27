@@ -11,6 +11,7 @@ fs = require 'fs'
 # requesting a URL like:
 # - http://localhost:8080/admtool/datadump/PanGen-Eu-QES_Español-sec3.csv?what=dump&prjid=157&grpid=401&intrvid=50&secid=3
 # - http://localhost:8080/admtool/datadump/ISBlaC-Aliquots_SP_New-sec1.xlsx?what=dump&prjid=188&grpid=4&intrvid=4100&secid=1&repd=1
+# - http://localhost:8080/admtool/datadump/PanGen-Eu-QES_Espa%C3%B1ol-sec2.xlsx?what=dump&prjid=157&grpid=4&intrvid=50&secid=2&repd=1
 # @param {Object} the server parameters to make a connection
 ###
 Downloader = (serverParams) ->
@@ -24,7 +25,7 @@ Downloader = (serverParams) ->
   passwd = serverParams.pass
 
 
-  urlIndex = "http://#{host}:#{port}/#{appName}/index.jsp"
+  urlIndex = "http://#{host}:#{port}/#{appName}/jsp/index.jsp"
   authUrl = "http://#{host}:#{port}/#{appName}/#{serverParams.authPath}"
   reqUrl = "http://#{host}:#{port}/#{appName}/#{servicePath}"
   logoutUrl = "http://#{host}:#{port}/#{appName}/logout.jsp?adm=1"
@@ -105,6 +106,7 @@ Downloader = (serverParams) ->
       qString = "#{qString}#{prop}=#{val}&"
 
     qString = qString.substr 0, qString.length-1
+    console.log "Downloader.buildDumpUrl: #{url}#{qString}"
     url = url + qString
 
   ###
@@ -141,6 +143,8 @@ Downloader = (serverParams) ->
       jar: cookieJar
 
     rp(dumpObj).pipe fs.createWriteStream(filename)
+
+    # rp dumpObj
 
   expose
 

@@ -1,6 +1,6 @@
 {
-  "name": "application-name",
-  "version": "0.0.1",
+  "name": "epiquest-cli-dumper",
+  "version": "0.1.0",
   "description": "",
   "engines": {
     "node": ">=0.10"
@@ -16,7 +16,8 @@
     "pg-hstore": "~2.0.0",
     "coffee-script": "~1.8.x",
     "bluebird": "^2.9.7",
-    "lodash": "^3.0"
+    "lodash": "^3.0",
+    "resolve": ""
   },
   "devDependencies": {
     "mocha": "~1.21.x",
@@ -42,7 +43,10 @@
     "gulp-mocha": "^2.x",
     "gulp-run": "~1.6.6"
   },
+  "scripts": {
+    "dumper-script": "coffee src/index.coffee -b resources/test.json"
+  },
   "bin": {
-    "dumper": "./main.js"
+    "epidumper": "./bin/dumpercli.js"
   }
 }

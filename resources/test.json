@@ -18,24 +18,24 @@
 
   dumps: [{
     "prj": "PanGen-Eu",
-    questionnaire: "QES_Español",
+    questionnaire: "RecogidaMuestra_ES",
     group: "spain",
     section: 2,
-    rep: true,
+    repd: true,
     out: ""
   }, {
     "prj": "PanGen-Eu",
     questionnaire: "QES_Spain",
     group: "spain",
     section: 3,
-    rep: 1,
+    repd: 1,
     out: ""
   }, {
     "prj": "PanGen-Eu",
     questionnaire: "QES_Español",
     group: "Hospital del Mar",
     section: 3,
-    rep: false,
+    repd: false,
     out: ""
   }]
 }
