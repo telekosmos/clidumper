@@ -22,11 +22,17 @@ module.exports = ->
   dbRetr = undefined
   dnldr = undefined
   loggedOut = false
+  globServerConfig = null
+  globDbConfig = null
 
   if jsonCfgFile
     jsonParser = new JSONParser(jsonCfgFile)
 
     jsonParser.parse().then (jsonObj) ->
+      if !jsonObj?
+        console.log "Configuration file malformed. You can check the content by validating at http://rmarcus.info/dirty-json/"
+        process.exit(1)
+
       dbCfg = jsonObj.db
       dumps = jsonObj.dumps
       serverCfg = jsonObj.server
@@ -34,15 +40,20 @@ module.exports = ->
         console.log "No configuration for database and application server where found in config file".red
         process.exit()
 
+      globDbConfig = dbCfg
       dbRetr = new DBRetriever dbCfg
       dbRetr.connect() # check if connection was right after this
 
+      globServerConfig = jsonObj.server
       dnldr = new Downloader serverCfg
       dnldr.serverAlive()
 
     .then (alive) ->
       if !alive
-        console.log "Unable to connect to application host: server may be unavailable".red
+        msg = "Unable to connect to application host: ".red
+        myHost = if globServerConfig.port then globServerConfig.host+':'+globServerConfig.port else globServerConfig.host
+        msg = msg + "#{myHost}".red.underline + " server may be unavailable".red
+        console.log msg
         process.exit()
 
       dumpPromises = []
@@ -62,6 +73,7 @@ module.exports = ->
       dnldr.login()
 
     .then (resp) ->
+      dumpReqs = []
       dumps.forEach (dump, index) ->
         dumpCfg =
           prjid: dump.prjid # actually is the project code
@@ -75,25 +87,33 @@ module.exports = ->
           # ISBlaC-Aliquots_SP_New-sec1.ext
           filename = "#{dump.prj}-#{dump.group}-#{dump.questionnaire}-sec#{dumpCfg.secid}"
           dumpCfg.repd = 1 if dump.repd
-          if dumpCfg.repd
-            dnldr.getXlsx dumpCfg, "#{filename}.xlsx"
-          else
-            dnldr.getCsv dumpCfg, "#{filename}.csv"
+          dumpCfg.filename = filename
+          dumpReqs.push dumpCfg
+
         else
-          console.log """Error in dump #{index+1}: some data could not be retreived from database (undefined):
+          console.log """Error in dump #{index+1}: some data could not be retrieved from database (#{globDbConfig.name}):
             \tProject id: #{dumpCfg.prjid}
             \tGroup id: #{dumpCfg.grpid}
             \tQuestionnaire id: #{dumpCfg.intrvid}
             \tSection order: #{dumpCfg.secid}
           """.red
 
+      console.log "Getting #{dumpReqs.length} dumps".red.bold
+      Promise.reduce dumpReqs
+      , (total, dumpReqCfg, index, numOfdumps) ->
+        if dumpReqCfg.repd
+          dnldr.getXlsx dumpReqCfg, "#{dumpReqCfg.filename}.xlsx"
+        else
+          dnldr.getCsv dumpReqCfg, "#{dumpReqCfg.filename}.csv"
+      , []
+
     .then (resp) ->
+      console.log 'Logging out the application'.blue
       dnldr.logout()
 
     .then (resp) ->
       loggedOut = true
-      console.log "\nClient logged out from application. Results can take a bit longer to arrive".green
-      console.log 'Please, wait until the prompt returns'.green
+      console.log "\nClient logged out from application and exiting\n".green
 
     .catch (err) ->
       dnldr.logout() if !loggedOut

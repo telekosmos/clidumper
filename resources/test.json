@@ -37,5 +37,12 @@
     section: 3,
     repd: false,
     out: ""
+  }, {
+    "prj": "PanGen-Eu",
+    questionnaire: "QES_Español",
+    group: "Spain",
+    section: 7,
+    repd: false,
+    out: ""
   }]
 }
