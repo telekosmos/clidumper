@@ -17,11 +17,11 @@
   },
 
   dumps: [{
-    "prj": "PanGen-Eu",
-    questionnaire: "RecogidaMuestra_ES",
+    "prj": "ISBlaC",
+    questionnaire: "Aliquots_SP_New",
     group: "spain",
-    section: 2,
-    repd: true,
+    section: 3,
+    repd: false,
     out: ""
   }, {
     "prj": "PanGen-Eu",

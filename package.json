@@ -1,5 +1,5 @@
 {
-  "name": "epiquest-cli-dumper",
+  "name": "epidumper",
   "version": "0.1.0",
   "description": "",
   "engines": {
@@ -12,7 +12,7 @@
     "colors": "~0.6.x",
     "dirty-json": ">=0.0.4 <0.1",
     "sequelize": "^2.0",
-    "pg": "~3.4.0",
+    "pg": "~4.3.0",
     "pg-hstore": "~2.0.0",
     "coffee-script": "~1.8.x",
     "bluebird": "^2.9.7",

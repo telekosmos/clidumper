@@ -1,4 +1,4 @@
-Cfg = require "/Users/telekosmos/DevOps/epiquest/cli-dumper/config/init"
+# Cfg = require "/Users/telekosmos/DevOps/epiquest/cli-dumper/config/init"
 
 Sequelize = require 'sequelize'
 Promise = require 'bluebird'
@@ -59,8 +59,9 @@ DBRetriever = (dbCfgObj) ->
       host: dbCfg.host or 'localhost'
       port: dbCfg.port or 5432
       dialect: 'postgres'
+      logging: false
 
-    sequelize = new Sequelize dbCfg.name, dbCfg.user, dbCfg.pwd, options
+    sequelize = new Sequelize dbCfg.name or 'appform', dbCfg.user, dbCfg.pwd, options
     null
 
   expose.sequelize = () -> sequelize

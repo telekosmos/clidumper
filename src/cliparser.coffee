@@ -16,6 +16,7 @@ parser = () ->
     .option '-b, --batch <config_file', 'Performs a batch data retrieval based on config file'
 
     program.parse(process.argv);
+    program.help() if !program.batch?
     program.batch if program.rawArgs.length > 3 && program.batch
 
   parserObj =

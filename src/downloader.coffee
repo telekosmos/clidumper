@@ -17,7 +17,7 @@ fs = require 'fs'
 Downloader = (serverParams) ->
   expose = {}
 
-  host = serverParams.host
+  host = serverParams.host or 'localhost'
   port = serverParams.port || 8080
   appName = serverParams.app || 'admtool'
   servicePath = serverParams.servicePath || 'datadump'
@@ -106,7 +106,8 @@ Downloader = (serverParams) ->
       qString = "#{qString}#{prop}=#{val}&"
 
     qString = qString.substr 0, qString.length-1
-    console.log "Downloader.buildDumpUrl: #{url}#{qString}"
+    msg = "Getting #{filename}".yellow
+    console.log "#{msg} (#{url}#{qString})"
     url = url + qString
 
   ###
