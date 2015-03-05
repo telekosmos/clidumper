@@ -128,13 +128,12 @@ Downloader = (serverParams) ->
     msg = "Getting #{filename}".yellow
     console.log "#{msg} (#{url})"
     # request(dumpObj).pipe fs.createWriteStream(filename)
-    console.log "Got #{filename}".cyan
 
     new Promise (resolve, reject) ->
       ws = fs.createWriteStream(filename)
       request.get(dumpObj).pipe ws
       ws.on 'finish', () ->
-        console.log "Finished writing write stream for #{filename}"
+        console.log "Got #{filename}".cyan
         resolve true
 
 

@@ -108,13 +108,12 @@ module.exports = ->
       , []
 
     .then (resp) ->
-      console.log 'About to logout'
+      console.log 'Logging out the application'.blue
       dnldr.logout()
 
     .then (resp) ->
       loggedOut = true
-      console.log "\nClient logged out from application. Results can take a bit longer to arrive".green
-      console.log 'Please, wait until the prompt returns'.green
+      console.log "\nClient logged out from application and exiting\n".green
 
     .catch (err) ->
       dnldr.logout() if !loggedOut
