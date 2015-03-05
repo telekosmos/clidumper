@@ -1,7 +1,7 @@
 
 
 Promise = require 'bluebird'
-# request = require 'request'
+request = require 'request'
 rp = require 'request-promise'
 _ = require 'lodash'
 fs = require 'fs'
@@ -19,16 +19,16 @@ Downloader = (serverParams) ->
 
   host = serverParams.host or 'localhost'
   port = serverParams.port || 8080
-  appName = serverParams.app || 'admtool'
-  servicePath = serverParams.servicePath || 'datadump'
+  appName = serverParams.app or 'admtool'
+  servicePath = serverParams.servicePath or 'datadump'
   username = serverParams.user
   passwd = serverParams.pass
 
-
-  urlIndex = "http://#{host}:#{port}/#{appName}/jsp/index.jsp"
-  authUrl = "http://#{host}:#{port}/#{appName}/#{serverParams.authPath}"
-  reqUrl = "http://#{host}:#{port}/#{appName}/#{servicePath}"
-  logoutUrl = "http://#{host}:#{port}/#{appName}/logout.jsp?adm=1"
+  serverHost = if port then "http://#{host}:#{port}" else "http://#{host}"
+  urlIndex = "#{serverHost}/#{appName}/jsp/index.jsp"
+  authUrl = "#{serverHost}/#{appName}/#{serverParams.authPath}"
+  reqUrl = "#{serverHost}/#{appName}/#{servicePath}"
+  logoutUrl = "#{serverHost}/#{appName}/logout.jsp?adm=1"
 
   cookieJar = rp.jar()
 
@@ -46,6 +46,7 @@ Downloader = (serverParams) ->
     index().then (httpResp) ->
       true
     .catch (err) ->
+      console.log "#{err}".red.bold
       false
 
   expose.logout = () ->
@@ -106,8 +107,6 @@ Downloader = (serverParams) ->
       qString = "#{qString}#{prop}=#{val}&"
 
     qString = qString.substr 0, qString.length-1
-    msg = "Getting #{filename}".yellow
-    console.log "#{msg} (#{url}#{qString})"
     url = url + qString
 
   ###
@@ -126,13 +125,18 @@ Downloader = (serverParams) ->
       resolveWithFullResponse: true
       jar: cookieJar
 
-    rp(dumpObj).pipe fs.createWriteStream(filename)
-    ###
-    new Promise (resolve, reject) ->
-      console.log "CSV: #{dumpObj.url}"
-      resolve dumpObj.url
+    msg = "Getting #{filename}".yellow
+    console.log "#{msg} (#{url})"
+    # request(dumpObj).pipe fs.createWriteStream(filename)
+    console.log "Got #{filename}".cyan
 
-    ###
+    new Promise (resolve, reject) ->
+      ws = fs.createWriteStream(filename)
+      request.get(dumpObj).pipe ws
+      ws.on 'finish', () ->
+        console.log "Finished writing write stream for #{filename}"
+        resolve true
+
 
 
   expose.getXlsx = (xlsxParams, filename) ->
@@ -143,7 +147,15 @@ Downloader = (serverParams) ->
       resolveWithFullResponse: true
       jar: cookieJar
 
-    rp(dumpObj).pipe fs.createWriteStream(filename)
+    msg = "Getting #{filename}".yellow
+    console.log "#{msg} (#{url})"
+
+    new Promise (resolve, reject) ->
+      ws = fs.createWriteStream(filename)
+      request.get(dumpObj).pipe ws
+      ws.on 'finish', () ->
+        console.log "Finished writing write stream for #{filename}"
+        resolve true
 
     # rp dumpObj
 
