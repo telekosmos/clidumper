@@ -3,6 +3,7 @@ gulp = require 'gulp'
 gutil = require 'gulp-util'
 concat = require 'gulp-concat'
 gulpif = require 'gulp-if'
+run = require 'gulp-run'
 mocha = require 'gulp-mocha'
 
 del = require 'del'
@@ -61,15 +62,15 @@ runTests = (done) ->
 
 runTests = () ->
   console.log 'Running tests!!!'
-  gulp.src './test/js/*-spec.js'
-  .pipe mocha({reporter: 'nyan'})
-
-gulp.task 'run-tests', ['compile-tests'], runTests
+  gulp.src './test/*-spec.coffee'
+  .pipe mocha({reporter: 'nyan', compilers: 'coffee:coffee-script/register'})
+gulp.task 'run-tests', runTests
+# gulp.task 'run-tests', ['compile-tests'], runTests
 
 
 runOneTest = () ->
   gulp.src program.file
-  .pipe mocha({reporter: 'nyan'})
+  .pipe mocha({reporter: 'nyan', colors: '', compilers: 'coffee:coffee-script/register'})
 
 gulp.task 'run-test-in', runOneTest
 
@@ -80,6 +81,15 @@ gulp.task 'list', () ->
 
 gulp.task 'clean-jstest', (cb) ->
   del(['test/js/*.js*'], cb)
+
+gulp.task 'clean-files', (cb) ->
+  del(['*.csv', '*.xls*'], cb)
+
+
+gulp.task 'run-index', () ->
+  run 'coffee index.coffee -b resources/test.json'
+  .exec()
+
 ###
 gulp.task 'clean-lib', (cb) ->
   del(['lib/* * / *.js*'], cb)

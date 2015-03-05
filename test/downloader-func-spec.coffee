@@ -4,12 +4,13 @@ chai = require 'chai'
 chaiAsPromised = require 'chai-as-promised'
 Cfg = require '/Users/telekosmos/DevOps/epiquest/cli-dumper/config/init'
 Downloader = require "#{Cfg.paths.root}/lib/downloader"
+sinon = require 'sinon'
 
 should = chai.should()
 chai.use(chaiAsPromised)
 
 
-describe 'Downloader data using paramas from config file', () ->
+describe 'Downloader data using params from config file', () ->
   downloader = null
   hostParams =
     host: 'localhost'
@@ -34,8 +35,14 @@ describe 'Downloader data using paramas from config file', () ->
     # filename: 'PanGen-Eu-QES_Español-sec3.csv'
   ]
 
+  pipeStub = null
   beforeEach () ->
     downloader = new Downloader(hostParams)
+
+  it 'should check server is alive', () ->
+    aliveProm = downloader.serverAlive()
+    aliveProm.should.eventually.be.fulfilled
+    aliveProm.should.eventually.be.an 'boolean'
 
 
   it 'should authentify via cookies', () ->
@@ -55,6 +62,7 @@ describe 'Downloader data using paramas from config file', () ->
       ckList[0].should.be.an 'object'
       downloader.logout()
 
+
   it 'should logout successfully', () ->
     logged = downloader.login()
     logged.should.eventually.be.fulfilled
@@ -66,24 +74,36 @@ describe 'Downloader data using paramas from config file', () ->
       loggedOut.should.eventually.be.fulfilled
 
 
+  ###
+  # @todo improve this test by mocking rp.pipe in order not to write file
+  ###
   it 'should retrieve csv data', () ->
     dumpCfg = dumpParams[1]
     dumpCfg.should.to.satisfy (obj) -> obj.repd == undefined || obj.repd == 0 || obj.repd == false
 
-    promise = downloader.getCsv dumpCfg, 'file.csv'
-    promise.should.eventually.be.fulfilled
-    promise.should.eventually.not.equal ""
-    promise.should.eventually.contain 'file.csv'
+    logged = downloader.login()
+    logged.should.eventually.be.fulfilled
+    logged.then (resp) ->
+      fw = downloader.getCsv dumpCfg, 'file.csv'
+      should.exist(fw)
+      fw.should.be.an 'object'
+    .then () ->
+      downloader.logout()
 
 
-
+  ###
+  # @todo improve this test by mocking rp.pipe in order not to write file
+  ###
   it 'should retrieve xlsx data', () ->
     dumpCfg = dumpParams[0]
     dumpCfg.should.to.contain.keys 'repd'
     dumpCfg.repd.should.to.satisfy (val) -> val == true || val == 1
 
-    promise = downloader.getXlsx dumpCfg, 'file.xlsx'
-    promise.should.eventually.be.fulfilled
-    promise.should.eventually.not.equal ""
-    promise.should.eventually.contain 'file.xlsx'
-    promise.should.eventually.contain 'repd'
+    logged = downloader.login()
+    logged.should.eventually.be.fulfilled
+    logged.then (resp) ->
+      fw = downloader.getXlsx dumpCfg, 'file.xlsx'
+      should.exist fw
+      fw.should.be.an 'object'
+    .then () ->
+      downloader.logout()

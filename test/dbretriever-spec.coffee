@@ -19,7 +19,7 @@ describe 'Database retrieval of ids based on dump parameters', () ->
       user: 'gcomesana'
       pwd: 'appform'
     dumps: [
-      prj: "Pangen-EU"
+      prj: "PanGen-Eu"
       questionnaire: "QES_Español"
       group: "spain"
       section: 2
@@ -102,7 +102,9 @@ describe 'Database retrieval of ids based on dump parameters', () ->
 
   it 'should retreive questionnaire dbid', () ->
     dbRetr.connect()
-    promise = dbRetr.getIntrvId(dumpCfgMock.dumps[0].questionnaire)
+    intrvName = dumpCfgMock.dumps[0].questionnaire
+    prjName = dumpCfgMock.dumps[0].prj
+    promise = dbRetr.getIntrvId intrvName, prjName
     promise.should.eventually.be.fulfilled
     promise.should.eventually.be.an 'array'
     # promise.should.eventually.be.equal 50
@@ -117,11 +119,34 @@ describe 'Database retrieval of ids based on dump parameters', () ->
 
   it 'should return undefined when no questionnaire', () ->
     dbRetr.connect()
-    promise = dbRetr.getIntrvId('QES_Spain')
+    promise = dbRetr.getIntrvId 'QES_Spain', 'ISBlaC'
     promise.should.eventually.be.fulfilled
     promise.should.eventually.be.empty
     promise.then (val) ->
       should.exist(val)
       val.should.be.empty
       val.length.should.be.eq 0
+
+
+  it 'should return all id values', () ->
+    dbRetr.connect()
+    prjName = dumpCfgMock.dumps[0].prj
+    grpName = dumpCfgMock.dumps[0].group
+    intrvName = dumpCfgMock.dumps[0].questionnaire
+    promise = dbRetr.getAll prjName, grpName, intrvName
+    promise.should.eventually.be.fulfilled
+    promise.should.eventually.be.an 'object'
+    promise.then (objVal) ->
+      should.exist objVal
+      should.exist objVal.prjIds
+      should.exist objVal.intrvIds
+      should.exist objVal.grpIds
+      objVal.prjIds[0].idprj.should.be.gt 0
+      objVal.grpIds[0].idgroup.should.be.gt 0
+      objVal.intrvIds.length.should.be.equal 1
+      ###
+      console.log "Ids: p: #{objVal.prjIds[0].idprj};
+        g: #{objVal.grpIds[0].idgroup};
+        i: #{objVal.intrvIds[0].idinterview}"
+      ###
 

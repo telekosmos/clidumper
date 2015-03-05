@@ -10,32 +10,39 @@
     "host": "localhost",
     "port": 8080,
     "app": "admtool",
-    "serviceName": "servlet/AjaxUtilServlet"
-    user: 'gcomesana@cnio.es',
-    pass: 'techn1C0'
+    "servicePath": "datadump"
+    user: 'mmarquez',
+    pass: 'mmarquez'
     authPath: '/jsp/j_security_check'
   },
 
   dumps: [{
-    "prj": "Pangen-EU",
-    questionnaire: "QES_Spain",
+    "prj": "ISBlaC",
+    questionnaire: "Aliquots_SP_New",
     group: "spain",
-    section: 2,
-    rep: true,
+    section: 3,
+    repd: false,
     out: ""
   }, {
-    "prj": "Pangen-EU",
+    "prj": "PanGen-Eu",
     questionnaire: "QES_Spain",
     group: "spain",
     section: 3,
-    rep: 1,
+    repd: 1,
     out: ""
   }, {
-    "prj": "Pangen-EU",
-    questionnaire: "QES_Spain",
+    "prj": "PanGen-Eu",
+    questionnaire: "QES_Español",
     group: "Hospital del Mar",
     section: 3,
-    rep: false,
+    repd: false,
+    out: ""
+  }, {
+    "prj": "PanGen-Eu",
+    questionnaire: "QES_Español",
+    group: "Spain",
+    section: 7,
+    repd: false,
     out: ""
   }]
 }

@@ -1,7 +1,7 @@
 
 
 Promise = require 'bluebird'
-# request = require 'request'
+request = require 'request'
 rp = require 'request-promise'
 _ = require 'lodash'
 fs = require 'fs'
@@ -11,23 +11,24 @@ fs = require 'fs'
 # requesting a URL like:
 # - http://localhost:8080/admtool/datadump/PanGen-Eu-QES_Español-sec3.csv?what=dump&prjid=157&grpid=401&intrvid=50&secid=3
 # - http://localhost:8080/admtool/datadump/ISBlaC-Aliquots_SP_New-sec1.xlsx?what=dump&prjid=188&grpid=4&intrvid=4100&secid=1&repd=1
+# - http://localhost:8080/admtool/datadump/PanGen-Eu-QES_Espa%C3%B1ol-sec2.xlsx?what=dump&prjid=157&grpid=4&intrvid=50&secid=2&repd=1
 # @param {Object} the server parameters to make a connection
 ###
 Downloader = (serverParams) ->
   expose = {}
 
-  host = serverParams.host
+  host = serverParams.host or 'localhost'
   port = serverParams.port || 8080
-  appName = serverParams.app || 'admtool'
-  servicePath = serverParams.servicePath || 'datadump'
+  appName = serverParams.app or 'admtool'
+  servicePath = serverParams.servicePath or 'datadump'
   username = serverParams.user
   passwd = serverParams.pass
 
-
-  urlIndex = "http://#{host}:#{port}/#{appName}/index.jsp"
-  authUrl = "http://#{host}:#{port}/#{appName}/#{serverParams.authPath}"
-  reqUrl = "http://#{host}:#{port}/#{appName}/#{servicePath}"
-  logoutUrl = "http://#{host}:#{port}/#{appName}/logout.jsp?adm=1"
+  serverHost = if port then "http://#{host}:#{port}" else "http://#{host}"
+  urlIndex = "#{serverHost}/#{appName}/jsp/index.jsp"
+  authUrl = "#{serverHost}/#{appName}/#{serverParams.authPath}"
+  reqUrl = "#{serverHost}/#{appName}/#{servicePath}"
+  logoutUrl = "#{serverHost}/#{appName}/logout.jsp?adm=1"
 
   cookieJar = rp.jar()
 
@@ -36,6 +37,17 @@ Downloader = (serverParams) ->
     reqPromise = rp {url: urlIndex, resolveWithFullResponse: true, jar: cookieJar}
     reqPromise
 
+  ###
+  # Checks if the server is alive by requesting the index page
+  # @return {boolean} true if is alive; otherwise false
+  # @promise
+  ###
+  expose.serverAlive = () ->
+    index().then (httpResp) ->
+      true
+    .catch (err) ->
+      console.log "#{err}".red.bold
+      false
 
   expose.logout = () ->
     logoutObj =
@@ -113,13 +125,17 @@ Downloader = (serverParams) ->
       resolveWithFullResponse: true
       jar: cookieJar
 
-    rp(dumpObj).pipe fs.createWriteStream(filename)
-    ###
-    new Promise (resolve, reject) ->
-      console.log "CSV: #{dumpObj.url}"
-      resolve dumpObj.url
+    msg = "Getting #{filename}".yellow
+    console.log "#{msg} (#{url})"
+    # request(dumpObj).pipe fs.createWriteStream(filename)
 
-    ###
+    new Promise (resolve, reject) ->
+      ws = fs.createWriteStream(filename)
+      request.get(dumpObj).pipe ws
+      ws.on 'finish', () ->
+        console.log "Got #{filename}".cyan
+        resolve true
+
 
 
   expose.getXlsx = (xlsxParams, filename) ->
@@ -130,7 +146,17 @@ Downloader = (serverParams) ->
       resolveWithFullResponse: true
       jar: cookieJar
 
-    rp(dumpObj).pipe fs.createWriteStream(filename)
+    msg = "Getting #{filename}".yellow
+    console.log "#{msg} (#{url})"
+
+    new Promise (resolve, reject) ->
+      ws = fs.createWriteStream(filename)
+      request.get(dumpObj).pipe ws
+      ws.on 'finish', () ->
+        console.log "Finished writing write stream for #{filename}"
+        resolve true
+
+    # rp dumpObj
 
   expose
 

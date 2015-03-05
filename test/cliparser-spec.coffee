@@ -2,13 +2,12 @@
 chai = require 'chai'
 should = chai.should()
 cfg = require '/Users/telekosmos/DevOps/epiquest/cli-dumper/config/init'
+CLIParser = require "#{cfg.paths.root}/#{cfg.paths.jsLib}/cliparser"
 
 describe 'CLI parser module', () ->
   cliParser = undefined
   beforeEach () ->
     # CLIParser = require '../../src/cliparser'
-    console.log "Loading cliparser at #{cfg.paths.root}/#{cfg.paths.jsLib}/cliparser.js"
-    CLIParser = require "#{cfg.paths.root}/#{cfg.paths.jsLib}/cliparser.js"
     cliParser = new CLIParser()
     process.argv.length = 0
 
@@ -29,7 +28,7 @@ describe 'CLI parser module', () ->
   it 'should retrieve the --batch arg', () ->
     # console.log("args: " + process.argv.length);
     should.exist(cliParser);
-    process.argv = ['node', 'cli', '--batch', 'dumpfile2.cfg'];
+    process.argv = ['node', 'cli', '--batch', 'resources/dumpfile2.cfg'];
     file = cliParser.parse();
     should.exist(file);
     file.should.not.be.empty;
