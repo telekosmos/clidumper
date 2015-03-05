@@ -1,0 +1,97 @@
+{
+  db: {
+    "host": "localhost",
+    "name": "appform",
+    "user": "gcomesana",
+    "pwd": "appform"
+  },
+
+  server: {
+    "host": "localhost",
+    "port": 8080,
+    "app": "admtool",
+    "servicePath": "datadump"
+    user: 'gcomesana@cnio.es',
+    pass: 'techn1C0'
+    authPath: '/jsp/j_security_check'
+  },
+
+  dumps: [{
+    "prj": "ISBlaC",
+    questionnaire: "Aliquots_SP_New",
+    group: "spain",
+    section: 3,
+    repd: false,
+    out: ""
+  }, {
+    "prj": "PanGen-Eu",
+    questionnaire: "QES_Spain",
+    group: "spain",
+    section: 3,
+    repd: 1,
+    out: ""
+  }, {
+    "prj": "PanGen-Eu",
+    questionnaire: "QES_Español",
+    group: "Spain",
+    section: 4,
+    repd: false,
+    out: ""
+  }, {
+    "prj": "PanGen-Eu",
+    questionnaire: "QES_Español",
+    group: "Spain",
+    section: 7,
+    repd: false,
+    out: ""
+  }, {
+    "prj": "PanGen-Eu",
+    questionnaire: "QES_German",
+    group: "Germany",
+    section: 8,
+    repd: false,
+    out: ""
+  }, {
+    "prj": "PanGen-Eu",
+    questionnaire: "QES_Frances",
+    group: "France",
+    section: 6,
+    repd: false,
+    out: ""
+  }, {
+    "prj": "ISBlaC",
+    questionnaire: "IDC - Impreso de Datos Clínicos",
+    group: "Spain",
+    section: 16,
+    repd: false,
+    out: ""
+  }, {
+    "prj": "PanGen-Eu",
+    questionnaire: "SampleCollection_UK",
+    group: "United kingdom",
+    section: 3,
+    repd: false,
+    out: ""
+  }, {
+    "prj": "PanGen-Eu",
+    questionnaire: "Aliquots_New_UK",
+    group: "United kingdom",
+    section: 4,
+    repd: true,
+    out: ""
+  }, {
+    "prj": "ISBlaC",
+    questionnaire: "IDC - Impreso de Datos Clínicos",
+    group: "spain",
+    section: 20,
+    repd: false,
+    out: ""
+  }, {
+    "prj": "ISBlaC",
+    questionnaire: "IDC - Impreso de Datos Clínicos",
+    group: "Hospital del mar",
+    section: 21,
+    repd: true,
+    out: ""
+  }]
+}

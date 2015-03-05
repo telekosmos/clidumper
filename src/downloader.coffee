@@ -129,8 +129,6 @@ Downloader = (serverParams) ->
     console.log "#{msg} (#{url})"
     # request(dumpObj).pipe fs.createWriteStream(filename)
     console.log "Got #{filename}".cyan
-    # ws = fs.createWriteStream(filename)
-    # r = request.get(dumpObj).pipe ws
 
     new Promise (resolve, reject) ->
       ws = fs.createWriteStream(filename)
@@ -151,9 +149,6 @@ Downloader = (serverParams) ->
 
     msg = "Getting #{filename}".yellow
     console.log "#{msg} (#{url})"
-    # request(dumpObj).pipe fs.createWriteStream(filename)
-    # ws = fs.createWriteStream(filename)
-    # r = request.get(dumpObj).pipe ws
 
     new Promise (resolve, reject) ->
       ws = fs.createWriteStream(filename)

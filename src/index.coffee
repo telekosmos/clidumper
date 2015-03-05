@@ -73,9 +73,8 @@ module.exports = ->
       dnldr.login()
 
     .then (resp) ->
-      dumpPromises = []
+      dumpReqs = []
       dumps.forEach (dump, index) ->
-
         dumpCfg =
           prjid: dump.prjid # actually is the project code
           grpid: dump.grpid
@@ -88,12 +87,8 @@ module.exports = ->
           # ISBlaC-Aliquots_SP_New-sec1.ext
           filename = "#{dump.prj}-#{dump.group}-#{dump.questionnaire}-sec#{dumpCfg.secid}"
           dumpCfg.repd = 1 if dump.repd
-          if dumpCfg.repd
-            pr = dnldr.getXlsx dumpCfg, "#{filename}.xlsx"
-          else
-            pr = dnldr.getCsv dumpCfg, "#{filename}.csv"
-
-          dumpPromises.push pr
+          dumpCfg.filename = filename
+          dumpReqs.push dumpCfg
 
         else
           console.log """Error in dump #{index+1}: some data could not be retrieved from database (#{globDbConfig.name}):
@@ -103,11 +98,18 @@ module.exports = ->
             \tSection order: #{dumpCfg.secid}
           """.red
 
-      Promise.all dumpPromises
+      console.log "Getting #{dumpReqs.length} dumps".red.bold
+      Promise.reduce dumpReqs
+      , (total, dumpReqCfg, index, numOfdumps) ->
+        if dumpReqCfg.repd
+          dnldr.getXlsx dumpReqCfg, "#{dumpReqCfg.filename}.xlsx"
+        else
+          dnldr.getCsv dumpReqCfg, "#{dumpReqCfg.filename}.csv"
+      , []
 
     .then (resp) ->
       console.log 'About to logout'
-      setTimeout (() -> dnldr.logout()), 1500
+      dnldr.logout()
 
     .then (resp) ->
       loggedOut = true
