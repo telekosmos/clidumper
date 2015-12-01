@@ -72,7 +72,7 @@ Next is an example of a configuration file, which can be used as a template:
   }]
 }
 ```
-The file is a "*dirty-json*" file, which means it doesn't have to fit the JSON strict requirements about double quotes and commas.
+The file is a "*__dirty-json__*" file, which means it doesn't have to fit the JSON strict requirements about double quotes and commas.
 
 **db** section holds the parameters for connecting to database:
 
